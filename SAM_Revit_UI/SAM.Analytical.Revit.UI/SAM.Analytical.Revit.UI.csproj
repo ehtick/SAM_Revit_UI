@@ -235,7 +235,6 @@
     <PackageReference Include="NetOfficeFw.Excel" Version="1.9.7" />
     <PackageReference Include="NetTopologySuite" Version="2.6.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
   <PropertyGroup>
     <PostBuildEvent>
