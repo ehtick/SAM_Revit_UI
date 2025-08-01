@@ -42,90 +42,90 @@ namespace SAM.Core.Revit.UI
                             continue;
                         }
 
-                        assemblies.Add(assembly);
+                        //assemblies.Add(assembly);
                     }
                 }
             }
 
             //NEW START
 
-            string[] paths_Main;
-            string directory_Main;
+            //string[] paths_Main;
+            //string directory_Main;
 
-            directory_Main = System.IO.Path.GetDirectoryName(directory);
-            paths_Main = System.IO.Directory.GetFiles(directory_Main, "*.dll");
-            foreach (string path_Main in paths_Main)
-            {
-                if (!System.IO.Path.GetFileNameWithoutExtension(path_Main).StartsWith("SAM", StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
+            //directory_Main = System.IO.Path.GetDirectoryName(directory);
+            //paths_Main = System.IO.Directory.GetFiles(directory_Main, "*.dll");
+            //foreach (string path_Main in paths_Main)
+            //{
+            //    if (!System.IO.Path.GetFileNameWithoutExtension(path_Main).StartsWith("SAM", StringComparison.OrdinalIgnoreCase))
+            //    {
+            //        continue;
+            //    }
 
-                try
-                {
-                    Assembly.LoadFrom(path_Main);
-                }
-                catch
-                {
+            //    try
+            //    {
+            //        Assembly.LoadFrom(path_Main);
+            //    }
+            //    catch
+            //    {
 
-                }
+            //    }
 
-            }
+            //}
 
-            paths_Main = System.IO.Directory.GetFiles(directory_Main, "*.gha");
-            foreach (string path_Main in paths_Main)
-            {
-                if (!System.IO.Path.GetFileNameWithoutExtension(path_Main).StartsWith("SAM", StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
+            //paths_Main = System.IO.Directory.GetFiles(directory_Main, "*.gha");
+            //foreach (string path_Main in paths_Main)
+            //{
+            //    if (!System.IO.Path.GetFileNameWithoutExtension(path_Main).StartsWith("SAM", StringComparison.OrdinalIgnoreCase))
+            //    {
+            //        continue;
+            //    }
 
-                try
-                {
-                    Assembly.LoadFrom(path_Main);
-                }
-                catch
-                {
+            //    try
+            //    {
+            //        Assembly.LoadFrom(path_Main);
+            //    }
+            //    catch
+            //    {
 
-                }
-            }
+            //    }
+            //}
 
-            directory_Main = directory;
-            paths_Main = System.IO.Directory.GetFiles(directory_Main, "*.dll");
-            foreach (string path_Main in paths_Main)
-            {
-                if (!System.IO.Path.GetFileNameWithoutExtension(path_Main).StartsWith("SAM", StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
+            //directory_Main = directory;
+            //paths_Main = System.IO.Directory.GetFiles(directory_Main, "*.dll");
+            //foreach (string path_Main in paths_Main)
+            //{
+            //    if (!System.IO.Path.GetFileNameWithoutExtension(path_Main).StartsWith("SAM", StringComparison.OrdinalIgnoreCase))
+            //    {
+            //        continue;
+            //    }
 
-                try
-                {
-                    Assembly.LoadFrom(path_Main);
-                }
-                catch
-                {
+            //    try
+            //    {
+            //        Assembly.LoadFrom(path_Main);
+            //    }
+            //    catch
+            //    {
 
-                }
-            }
+            //    }
+            //}
 
-            paths_Main = System.IO.Directory.GetFiles(directory_Main, "*.gha");
-            foreach (string path_Main in paths_Main)
-            {
-                if (!System.IO.Path.GetFileNameWithoutExtension(path_Main).StartsWith("SAM", StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
+            //paths_Main = System.IO.Directory.GetFiles(directory_Main, "*.gha");
+            //foreach (string path_Main in paths_Main)
+            //{
+            //    if (!System.IO.Path.GetFileNameWithoutExtension(path_Main).StartsWith("SAM", StringComparison.OrdinalIgnoreCase))
+            //    {
+            //        continue;
+            //    }
 
-                try
-                {
-                    Assembly.LoadFrom(path_Main);
-                }
-                catch
-                {
+            //    try
+            //    {
+            //        Assembly.LoadFrom(path_Main);
+            //    }
+            //    catch
+            //    {
 
-                }
-            }
+            //    }
+            //}
 
             //NEW END
 
