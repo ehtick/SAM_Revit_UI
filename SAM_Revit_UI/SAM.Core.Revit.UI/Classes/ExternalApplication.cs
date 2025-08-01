@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.Loader;
 
 namespace SAM.Core.Revit.UI
 {
@@ -9,7 +10,7 @@ namespace SAM.Core.Revit.UI
     {
         public static string TabName { get; } = "SAM";
 
-        public static Windows.WindowHandle WindowHandle { get; } = new Windows.WindowHandle(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle);
+        public static WindowHandle WindowHandle { get; } = new WindowHandle(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle);
 
         public static string GetAssemblyPath()
         {
@@ -45,6 +46,88 @@ namespace SAM.Core.Revit.UI
                     }
                 }
             }
+
+            //NEW START
+
+            string[] paths_Main;
+            string directory_Main;
+
+            directory_Main = System.IO.Path.GetDirectoryName(directory);
+            paths_Main = System.IO.Directory.GetFiles(directory_Main, "*.dll");
+            foreach (string path_Main in paths_Main)
+            {
+                if (!System.IO.Path.GetFileNameWithoutExtension(path_Main).StartsWith("SAM", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    Assembly.LoadFrom(path_Main);
+                }
+                catch
+                {
+
+                }
+
+            }
+
+            paths_Main = System.IO.Directory.GetFiles(directory_Main, "*.gha");
+            foreach (string path_Main in paths_Main)
+            {
+                if (!System.IO.Path.GetFileNameWithoutExtension(path_Main).StartsWith("SAM", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    Assembly.LoadFrom(path_Main);
+                }
+                catch
+                {
+
+                }
+            }
+
+            directory_Main = directory;
+            paths_Main = System.IO.Directory.GetFiles(directory_Main, "*.dll");
+            foreach (string path_Main in paths_Main)
+            {
+                if (!System.IO.Path.GetFileNameWithoutExtension(path_Main).StartsWith("SAM", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    Assembly.LoadFrom(path_Main);
+                }
+                catch
+                {
+
+                }
+            }
+
+            paths_Main = System.IO.Directory.GetFiles(directory_Main, "*.gha");
+            foreach (string path_Main in paths_Main)
+            {
+                if (!System.IO.Path.GetFileNameWithoutExtension(path_Main).StartsWith("SAM", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    Assembly.LoadFrom(path_Main);
+                }
+                catch
+                {
+
+                }
+            }
+
+            //NEW END
 
             List<ISAMRibbonItemData> sAMRibbonItemDatas = new List<ISAMRibbonItemData>();
             foreach (Assembly assembly in assemblies)
