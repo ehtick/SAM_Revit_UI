@@ -83,6 +83,9 @@
         <Reference Include="SAM.Analytical.Tas">
             <HintPath>..\..\..\SAM_Tas\build\SAM.Analytical.Tas.dll</HintPath>
         </Reference>
+        <Reference Include="SAM.Analytical.Tas.TPD">
+          <HintPath>..\..\..\SAM_Tas\build\SAM.Analytical.Tas.TPD.dll</HintPath>
+        </Reference>
         <Reference Include="SAM.Analytical.Topologic">
             <HintPath>..\..\..\SAM_Topologic\build\SAM.Analytical.Topologic.dll</HintPath>
         </Reference>

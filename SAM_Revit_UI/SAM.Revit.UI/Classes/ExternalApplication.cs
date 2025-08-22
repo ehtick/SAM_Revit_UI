@@ -21,35 +21,33 @@ namespace SAM.Revit.UI.Classes
 
         public Result OnStartup(UIControlledApplication application)
         {
-            if (application?.ControlledApplication?.VersionNumber is not string versionNumber)
-            {
-                return Result.Failed;
-            }
-
             string path = Assembly.GetExecutingAssembly().Location;
-            string directory = Path.GetDirectoryName(path)!;
+            string directory_Revit = Path.GetDirectoryName(path)!;
+
+            string directory_SAM = Path.GetDirectoryName(directory_Revit)!;
 
             assemblyResolver.Enable(
               managedDirectories:
               [
-                directory,
+                directory_Revit,
+                directory_SAM
                 //Path.Combine(directory, "lib")
               ],
               nativeDirectories:
               [
-                Path.Combine(directory, "runtimes", "win-x64", "native"),
+                Path.Combine(directory_Revit, "runtimes", "win-x64", "native"),
+                Path.Combine(directory_SAM, "runtimes", "win-x64", "native"),
               ]
             );
 
             // Optional: pin a specific version if you ship it (example)
-            // AssemblyResolver.AddRedirect("Newtonsoft.Json",
-            //   "Newtonsoft.Json, Version=13.0.3.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed");
+            //assemblyResolver.AddRedirect("Newtonsoft.Json","Newtonsoft.Json, Version=13.0.3.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed");
 
             List<string> names = ["SAM.Core.Revit.UI.dll"];
 
             foreach (string name in names)
             {
-                string path_Temp = Path.Combine(directory, name);
+                string path_Temp = Path.Combine(directory_Revit, name);
 
                 IExternalApplication? externalApplication = LoadExternalApplication(path_Temp);
                 if (externalApplication is null)
