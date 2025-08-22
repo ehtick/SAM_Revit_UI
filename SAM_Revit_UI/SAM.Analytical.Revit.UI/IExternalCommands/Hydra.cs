@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
 using SAM.Core.Revit.UI;
 using System.Windows.Media.Imaging;
@@ -22,9 +23,11 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => typeof(AlwaysAvailableExternalCommandAvailability).FullName;
 
-        public override void Execute()
+        public override Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             Core.Query.StartProcess(Core.Link.Hydra);
+
+            return Result.Succeeded;
         }
     }
 }

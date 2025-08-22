@@ -26,13 +26,12 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-
-        public override void Execute()
+        public override Result Execute(ExternalCommandData ExternalCommandData, ref string message, ElementSet elements)
         {
             Document document = ExternalCommandData?.Application?.ActiveUIDocument?.Document;
             if (document == null)
             {
-                return;
+                return Result.Failed;
             }
 
             List<BuiltInCategory> builtInCategories = new List<BuiltInCategory>()
@@ -54,28 +53,28 @@ namespace SAM.Analytical.Revit.UI
 
             LogicalOrFilter logicalOrFilter = new LogicalOrFilter(builtInCategories.ConvertAll(x => new ElementCategoryFilter(x) as ElementFilter));
 
-            List<Element> elements = new FilteredElementCollector(document).WherePasses(logicalOrFilter).WhereElementIsNotElementType().ToList();
+            List<Element> elements_Temp = new FilteredElementCollector(document).WherePasses(logicalOrFilter).WhereElementIsNotElementType().ToList();
 
 #if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022 || Revit2023 || Revit2024
             using (Core.Windows.Forms.TreeViewForm<Element> treeViewForm = new Core.Windows.Forms.TreeViewForm<Element>("Select Elements", elements, (Element x) => string.Format("{0} [{1}]", x.Name, x.Id.IntegerValue), (Element x) => x.Category.Name, (Element x) =>x.Id.IntegerValue != 311))
 #else
-            using (Core.Windows.Forms.TreeViewForm<Element> treeViewForm = new Core.Windows.Forms.TreeViewForm<Element>("Select Elements", elements, (Element x) => string.Format("{0} [{1}]", x.Name, x.Id.Value), (Element x) => x.Category.Name, (Element x) => x.Id.Value != 311))
+            using (Core.Windows.Forms.TreeViewForm<Element> treeViewForm = new Core.Windows.Forms.TreeViewForm<Element>("Select Elements", elements_Temp, (Element x) => string.Format("{0} [{1}]", x.Name, x.Id.Value), (Element x) => x.Category.Name, (Element x) => x.Id.Value != 311))
 #endif
             {
                 treeViewForm.CollapseAll();
                 if (treeViewForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 {
-                    return;
+                    return Result.Cancelled;
                 }
 
-                elements = treeViewForm.SelectedItems;
+                elements_Temp = treeViewForm.SelectedItems;
             }
             using (Transaction transaction = new Transaction(document, "Clean"))
             {
                 transaction.Start();
 
                 List<ElementId> elementIds = new List<ElementId>();
-                foreach (Element element in elements)
+                foreach (Element element in elements_Temp)
                 {
                     if (element == null || !element.IsValidObject)
                     {
@@ -94,6 +93,8 @@ namespace SAM.Analytical.Revit.UI
 
                 transaction.Commit();
             }
+
+            return Result.Succeeded;
         }
     }
 }

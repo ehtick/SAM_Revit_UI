@@ -25,18 +25,18 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override void Execute()
+        public override Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            Document document = ExternalCommandData?.Application?.ActiveUIDocument?.Document;
+            Document document = commandData?.Application?.ActiveUIDocument?.Document;
             if (document == null)
             {
-                return;
+                return Result.Failed;
             }
 
             List<ViewSheet> viewSheets = new FilteredElementCollector(document).OfClass(typeof(ViewSheet)).Cast<ViewSheet>().ToList();
             if (viewSheets == null || viewSheets.Count == 0)
             {
-                return;
+                return Result.Failed;
             }
 
             List<int> ids = new List<int>() { 725518, 725533, 802983, 805316, 835480, 1007139, 1008572 };
@@ -49,7 +49,7 @@ namespace SAM.Analytical.Revit.UI
             {
                 if (treeViewForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 {
-                    return;
+                    return Result.Cancelled;
                 }
 
                 viewSheets = treeViewForm.SelectedItems;
@@ -57,7 +57,7 @@ namespace SAM.Analytical.Revit.UI
 
             if (viewSheets == null || viewSheets.Count == 0)
             {
-                return;
+                return Result.Failed;
             }
 
             using (Transaction transaction = new Transaction(document, "Delete Sheets"))
@@ -68,6 +68,8 @@ namespace SAM.Analytical.Revit.UI
 
                 transaction.Commit();
             }
+
+            return Result.Succeeded;
         }
     }
 }

@@ -29,12 +29,12 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => typeof(AlwaysAvailableExternalCommandAvailability).FullName;
 
-        public override void Execute()
+        public override Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            Autodesk.Revit.ApplicationServices.Application application = ExternalCommandData?.Application?.Application;
+            Autodesk.Revit.ApplicationServices.Application application = commandData?.Application?.Application;
             if (application == null)
             {
-                return;
+                return Result.Failed;
             }
 
             string path_Excel = null;
@@ -45,14 +45,14 @@ namespace SAM.Analytical.Revit.UI
                 openFileDialog.Title = "Select Excel file";
                 if (openFileDialog.ShowDialog() != DialogResult.OK)
                 {
-                    return;
+                    return Result.Cancelled;
                 }
                 path_Excel = openFileDialog.FileName;
             }
 
             if (string.IsNullOrEmpty(path_Excel))
             {
-                return;
+                return Result.Failed;
             }
 
             string path_SharedParametersFile = null;
@@ -63,14 +63,14 @@ namespace SAM.Analytical.Revit.UI
                 saveFileDialog.Title = "Select Shared Parameter file";
                 if (saveFileDialog.ShowDialog() != DialogResult.OK)
                 {
-                    return;
+                    return Result.Cancelled;
                 }
                 path_SharedParametersFile = saveFileDialog.FileName;
             }
 
             if (string.IsNullOrEmpty(path_SharedParametersFile))
             {
-                return;
+                return Result.Failed;
             }
 
             System.IO.File.WriteAllText(path_SharedParametersFile, string.Empty);
@@ -177,6 +177,7 @@ namespace SAM.Analytical.Revit.UI
 
             Core.Excel.Modify.Edit(path_Excel, "Live", func);
 
+            return Result.Succeeded;
         }
     }
 }

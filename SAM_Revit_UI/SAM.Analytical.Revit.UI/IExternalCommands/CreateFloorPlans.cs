@@ -26,18 +26,18 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override void Execute()
+        public override Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            Document document = Document;
+            Document document = commandData.Application.ActiveUIDocument.Document;
             if (document == null)
             {
-                return;
+                return Result.Failed;
             }
 
             List<ViewPlan> viewPlans = new FilteredElementCollector(document).OfClass(typeof(ViewPlan)).Cast<ViewPlan>().ToList();
             if (viewPlans == null || viewPlans.Count == 0)
             {
-                return;
+                return Result.Failed;
             }
 
             ViewPlan viewPlan = null;
@@ -49,7 +49,7 @@ namespace SAM.Analytical.Revit.UI
             {
                 if (comboBoxForm.ShowDialog() != DialogResult.OK)
                 {
-                    return;
+                    return Result.Cancelled;
                 }
 
                 viewPlan = comboBoxForm.SelectedItem;
@@ -58,14 +58,14 @@ namespace SAM.Analytical.Revit.UI
             if (viewPlan == null)
             {
                 MessageBox.Show("Could not find view to be duplicated");
-                return;
+                return Result.Cancelled;
             }
 
             List<Level> levels = new FilteredElementCollector(document).OfClass(typeof(Level)).Cast<Level>().ToList();
             if (levels == null || levels.Count == 0)
             {
                 MessageBox.Show("Could not find levels");
-                return;
+                return Result.Cancelled;
             }
 
             using (Transaction transaction = new Transaction(document, "Create Views"))
@@ -74,6 +74,8 @@ namespace SAM.Analytical.Revit.UI
                 List<ViewPlan> result = Core.Revit.Modify.DuplicateViewPlan(viewPlan, levels, true);
                 transaction.Commit();
             }
+
+            return Result.Succeeded;
         }
     }
 }

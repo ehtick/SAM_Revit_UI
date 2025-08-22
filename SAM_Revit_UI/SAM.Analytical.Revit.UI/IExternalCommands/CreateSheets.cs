@@ -26,12 +26,12 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override void Execute()
+        public override Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            Document document = Document;
+            Document document = commandData.Application.ActiveUIDocument.Document;
             if (document == null)
             {
-                return;
+                return Result.Failed;
             }
 
             List<ViewSheet> viewSheets = new FilteredElementCollector(document).OfClass(typeof(ViewSheet)).Cast<ViewSheet>().ToList();
@@ -45,7 +45,7 @@ namespace SAM.Analytical.Revit.UI
             {
                 if (comboBoxForm.ShowDialog() != DialogResult.OK)
                 {
-                    return;
+                    return Result.Cancelled;
                 }
 
                 viewSheet = comboBoxForm.SelectedItem;
@@ -53,7 +53,7 @@ namespace SAM.Analytical.Revit.UI
 
             if (viewSheet == null)
             {
-                return;
+                return Result.Failed;
             }
 
             List<ViewPlan> viewPlans = new FilteredElementCollector(document).OfClass(typeof(ViewPlan)).Cast<ViewPlan>().ToList();
@@ -61,7 +61,7 @@ namespace SAM.Analytical.Revit.UI
             if (viewPlans == null || viewPlans.Count == 0)
             {
                 MessageBox.Show("Could not find Template View Plans");
-                return;
+                return Result.Cancelled;
             }
 
             List<string> templateNames = null;
@@ -69,7 +69,7 @@ namespace SAM.Analytical.Revit.UI
             {
                 if (treeViewForm.ShowDialog() != DialogResult.OK)
                 {
-                    return;
+                    return Result.Cancelled;
                 }
 
                 templateNames = treeViewForm.SelectedItems?.ConvertAll(x => x.Name);
@@ -81,6 +81,8 @@ namespace SAM.Analytical.Revit.UI
                 List<ViewSheet> result = Core.Revit.Create.Sheets(viewSheet, templateNames, true);
                 transaction.Commit();
             }
+
+            return Result.Succeeded;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using SAM.Core.Revit.UI.Properties;
 using System.Windows.Media.Imaging;
 
@@ -21,9 +22,11 @@ namespace SAM.Core.Revit.UI
 
         public override string AvailabilityClassName => typeof(AlwaysAvailableExternalCommandAvailability).FullName;
 
-        public override void Execute()
+        public override Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             Query.StartProcess("https://github.com/HoareLea/SAM/issues/new/choose");
+
+            return Result.Succeeded;
         }
     }
 }

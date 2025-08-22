@@ -25,18 +25,18 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override void Execute()
+        public override Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            Document document = Document;
+            Document document = commandData.Application.ActiveUIDocument.Document;
             if (document == null)
             {
-                return;
+                return Result.Failed;
             }
 
             List<View> views = new FilteredElementCollector(document).OfClass(typeof(View)).Cast<View>().ToList();
             if (views == null || views.Count == 0)
             {
-                return;
+                return Result.Failed;
             }
 
             for (int i = views.Count - 1; i >= 0; i--)
@@ -68,7 +68,7 @@ namespace SAM.Analytical.Revit.UI
             {
                 if (treeViewForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 {
-                    return;
+                    return Result.Cancelled;
                 }
 
                 templateNames = treeViewForm.SelectedItems?.ConvertAll(x => x.Name);
@@ -76,7 +76,7 @@ namespace SAM.Analytical.Revit.UI
 
             if (templateNames == null || templateNames.Count == 0)
             {
-                return;
+                return Result.Failed;
             }
 
             using (Transaction transaction = new Transaction(document, "Delete Views"))
@@ -90,6 +90,8 @@ namespace SAM.Analytical.Revit.UI
 
                 transaction.Commit();
             }
+
+            return Result.Succeeded;
         }
     }
 }

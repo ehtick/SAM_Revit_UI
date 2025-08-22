@@ -2,11 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Runtime.Loader;
 
 namespace SAM.Core.Revit.UI
 {
-    public class ExternalApplication : Nice3point.Revit.Toolkit.External.ExternalApplication
+    public class ExternalApplication : IExternalApplication
     {
         public static string TabName { get; } = "SAM";
 
@@ -22,9 +21,14 @@ namespace SAM.Core.Revit.UI
             return System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly()?.Location);
         }
 
-        public override void OnStartup()
+        public Result OnShutdown(UIControlledApplication application)
         {
-            Application.CreateRibbonTab(TabName);
+            return Result.Succeeded;
+        }
+
+        public Result OnStartup(UIControlledApplication application)
+        {
+            application.CreateRibbonTab(TabName);
 
             List<Assembly> assemblies = new List<Assembly>();
 
@@ -42,92 +46,10 @@ namespace SAM.Core.Revit.UI
                             continue;
                         }
 
-                        //assemblies.Add(assembly);
+                        assemblies.Add(assembly);
                     }
                 }
             }
-
-            //NEW START
-
-            //string[] paths_Main;
-            //string directory_Main;
-
-            //directory_Main = System.IO.Path.GetDirectoryName(directory);
-            //paths_Main = System.IO.Directory.GetFiles(directory_Main, "*.dll");
-            //foreach (string path_Main in paths_Main)
-            //{
-            //    if (!System.IO.Path.GetFileNameWithoutExtension(path_Main).StartsWith("SAM", StringComparison.OrdinalIgnoreCase))
-            //    {
-            //        continue;
-            //    }
-
-            //    try
-            //    {
-            //        Assembly.LoadFrom(path_Main);
-            //    }
-            //    catch
-            //    {
-
-            //    }
-
-            //}
-
-            //paths_Main = System.IO.Directory.GetFiles(directory_Main, "*.gha");
-            //foreach (string path_Main in paths_Main)
-            //{
-            //    if (!System.IO.Path.GetFileNameWithoutExtension(path_Main).StartsWith("SAM", StringComparison.OrdinalIgnoreCase))
-            //    {
-            //        continue;
-            //    }
-
-            //    try
-            //    {
-            //        Assembly.LoadFrom(path_Main);
-            //    }
-            //    catch
-            //    {
-
-            //    }
-            //}
-
-            //directory_Main = directory;
-            //paths_Main = System.IO.Directory.GetFiles(directory_Main, "*.dll");
-            //foreach (string path_Main in paths_Main)
-            //{
-            //    if (!System.IO.Path.GetFileNameWithoutExtension(path_Main).StartsWith("SAM", StringComparison.OrdinalIgnoreCase))
-            //    {
-            //        continue;
-            //    }
-
-            //    try
-            //    {
-            //        Assembly.LoadFrom(path_Main);
-            //    }
-            //    catch
-            //    {
-
-            //    }
-            //}
-
-            //paths_Main = System.IO.Directory.GetFiles(directory_Main, "*.gha");
-            //foreach (string path_Main in paths_Main)
-            //{
-            //    if (!System.IO.Path.GetFileNameWithoutExtension(path_Main).StartsWith("SAM", StringComparison.OrdinalIgnoreCase))
-            //    {
-            //        continue;
-            //    }
-
-            //    try
-            //    {
-            //        Assembly.LoadFrom(path_Main);
-            //    }
-            //    catch
-            //    {
-
-            //    }
-            //}
-
-            //NEW END
 
             List<ISAMRibbonItemData> sAMRibbonItemDatas = new List<ISAMRibbonItemData>();
             foreach (Assembly assembly in assemblies)
@@ -165,14 +87,16 @@ namespace SAM.Core.Revit.UI
                     ribbonPanelName = "General";
                 }
 
-                RibbonPanel ribbonPanel = Application.GetRibbonPanels(TabName)?.Find(x => x.Name == ribbonPanelName);
+                RibbonPanel ribbonPanel = application.GetRibbonPanels(TabName)?.Find(x => x.Name == ribbonPanelName);
                 if (ribbonPanel == null)
                 {
-                    ribbonPanel = Application.CreateRibbonPanel(TabName, ribbonPanelName);
+                    ribbonPanel = application.CreateRibbonPanel(TabName, ribbonPanelName);
                 }
 
                 sAMRibbonItemData.Create(ribbonPanel);
             }
+
+            return Result.Succeeded;
         }
     }
 }

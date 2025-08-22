@@ -27,29 +27,29 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override void Execute()
+        public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elements)
         {
-            Document document = ExternalCommandData?.Application?.ActiveUIDocument?.Document;
+            Document document = externalCommandData?.Application?.ActiveUIDocument?.Document;
             if (document == null)
             {
-                return;
+                return Result.Failed;
             }
 
             IList<Reference> references = null;
 
             try
             {
-                references = ExternalCommandData.Application.ActiveUIDocument.Selection.PickObjects(Autodesk.Revit.UI.Selection.ObjectType.Element);
+                references = externalCommandData.Application.ActiveUIDocument.Selection.PickObjects(Autodesk.Revit.UI.Selection.ObjectType.Element);
             }
             catch
             {
-                return;
+                return Result.Failed;
             }
 
 
             if (references == null)
             {
-                return;
+                return Result.Failed;
             }
 
             List<Autodesk.Revit.DB.Mechanical.Space> spaces_Revit = new List<Autodesk.Revit.DB.Mechanical.Space>();
@@ -66,7 +66,7 @@ namespace SAM.Analytical.Revit.UI
 
             if (spaces_Revit == null || spaces_Revit.Count == 0)
             {
-                return;
+                return Result.Failed;
             }
 
             AnalyticalModel analyticalModel = null;
@@ -115,7 +115,7 @@ namespace SAM.Analytical.Revit.UI
             List<Space> spaces = analyticalModel?.GetSpaces();
             if (spaces == null || spaces.Count == 0)
             {
-                return;
+                return Result.Failed;
             }
 
             List<Tuple<Space, Autodesk.Revit.DB.Mechanical.Space>> tuples = new List<Tuple<Space, Autodesk.Revit.DB.Mechanical.Space>>();
@@ -136,7 +136,7 @@ namespace SAM.Analytical.Revit.UI
                 {
                     if (internalConditionForm.ShowDialog() != DialogResult.OK)
                     {
-                        return;
+                        return Result.Cancelled;
                     }
 
                     tuples[0] = new Tuple<Space, Autodesk.Revit.DB.Mechanical.Space>(internalConditionForm.Space, tuples[0].Item2);
@@ -151,7 +151,7 @@ namespace SAM.Analytical.Revit.UI
                 {
                     if (spacesForm.ShowDialog() != DialogResult.OK)
                     {
-                        return;
+                        return Result.Cancelled;
                     }
 
                     List<Space> spaces_Temp = spacesForm.Spaces?.ToList();
@@ -218,6 +218,8 @@ namespace SAM.Analytical.Revit.UI
 
                 transaction.Commit();
             }
+
+            return Result.Succeeded;
         }
     }
 }

@@ -27,12 +27,12 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override void Execute()
+        public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elements)
         {
-            Document document = Document;
+            Document document = externalCommandData?.Application.ActiveUIDocument.Document;
             if (document == null)
             {
-                return;
+                return Result.Failed;
             }
 
             string path_Excel = null;
@@ -43,7 +43,7 @@ namespace SAM.Analytical.Revit.UI
                 openFileDialog.Title = "Select Excel file";
                 if (openFileDialog.ShowDialog() != DialogResult.OK)
                 {
-                    return;
+                    return Result.Cancelled;
                 }
 
                 path_Excel = openFileDialog.FileName;
@@ -51,13 +51,13 @@ namespace SAM.Analytical.Revit.UI
 
             if (string.IsNullOrWhiteSpace(path_Excel))
             {
-                return;
+                return Result.Failed;
             }
 
             object[,] objects = Core.Excel.Query.Values(path_Excel, "Live");
             if (objects == null || objects.GetLength(0) <= 1 || objects.GetLength(1) < 11)
             {
-                return;
+                return Result.Failed;
             }
 
             int index_Group = 2;
@@ -69,20 +69,20 @@ namespace SAM.Analytical.Revit.UI
             List<string> names_Selected = Query.ParameterNames(objects, index_Group, index_Name, unselected);
             if (names_Selected == null || names_Selected.Count == 0)
             {
-                return;
+                return Result.Failed;
             }
 
-            string path_SharedParametersFile = ExternalCommandData.Application.Application.SharedParametersFilename;
+            string path_SharedParametersFile = externalCommandData.Application.Application.SharedParametersFilename;
 
             string path_SharedParametersFile_Temp = System.IO.Path.GetTempFileName();
             System.IO.File.WriteAllText(path_SharedParametersFile_Temp, string.Empty);
-            ExternalCommandData.Application.Application.SharedParametersFilename = path_SharedParametersFile_Temp;
+            externalCommandData.Application.Application.SharedParametersFilename = path_SharedParametersFile_Temp;
 
             using (Transaction transaction = new Transaction(document, "Add Parameters"))
             {
                 transaction.Start();
 
-                using (Core.Revit.SharedParameterFileWrapper sharedParameterFileWrapper = new Core.Revit.SharedParameterFileWrapper(ExternalCommandData.Application.Application))
+                using (Core.Revit.SharedParameterFileWrapper sharedParameterFileWrapper = new Core.Revit.SharedParameterFileWrapper(externalCommandData.Application.Application))
                 {
                     sharedParameterFileWrapper.Open();
 
@@ -228,9 +228,9 @@ namespace SAM.Analytical.Revit.UI
 
                                                         Autodesk.Revit.DB.Binding binding = null;
                                                         if (instance != null && instance.Trim().ToUpper() == "INSTANCE")
-                                                            binding = ExternalCommandData.Application.Application.Create.NewInstanceBinding(categorySet);
+                                                            binding = externalCommandData.Application.Application.Create.NewInstanceBinding(categorySet);
                                                         else
-                                                            binding = ExternalCommandData.Application.Application.Create.NewTypeBinding(categorySet);
+                                                            binding = externalCommandData.Application.Application.Create.NewTypeBinding(categorySet);
 
                                                         bindingMap.Insert(definition, binding, groupTypeId);
                                                     }
@@ -253,10 +253,12 @@ namespace SAM.Analytical.Revit.UI
                 transaction.Commit();
             }
 
-            ExternalCommandData.Application.Application.SharedParametersFilename = path_SharedParametersFile;
-            ExternalCommandData.Application.Application.OpenSharedParameterFile();
+            externalCommandData.Application.Application.SharedParametersFilename = path_SharedParametersFile;
+            externalCommandData.Application.Application.OpenSharedParameterFile();
 
             System.IO.File.Delete(path_SharedParametersFile_Temp);
+
+            return Result.Succeeded;
         }
     }
 }

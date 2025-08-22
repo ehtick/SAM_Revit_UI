@@ -26,26 +26,26 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override void Execute()
+        public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elements)
         {
-            Document document = Document;
+            Document document = externalCommandData.Application.ActiveUIDocument.Document;
 
             List<View> views = new FilteredElementCollector(document).OfClass(typeof(View)).Cast<View>().ToList();
             if (views == null || views.Count == 0)
             {
-                return;
+                return Result.Failed;
             }
 
             List<ElementType> elementTypes = new FilteredElementCollector(document).OfCategory(BuiltInCategory.OST_WallTags).OfClass(typeof(ElementType)).Cast<ElementType>().ToList();
             if (elementTypes == null || elementTypes.Count == 0)
             {
-                return;
+                return Result.Failed;
             }
 
             List<Autodesk.Revit.DB.Wall> walls = new FilteredElementCollector(document).OfCategory(BuiltInCategory.OST_Walls).OfClass(typeof(Autodesk.Revit.DB.Wall)).Cast<Autodesk.Revit.DB.Wall>().ToList();
             if (walls == null || walls.Count == 0)
             {
-                return;
+                return Result.Failed;
             }
 
             for (int i = views.Count - 1; i >= 0; i--)
@@ -77,7 +77,7 @@ namespace SAM.Analytical.Revit.UI
                 textBoxForm.Value = minLength;
                 if (textBoxForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 {
-                    return;
+                    return Result.Cancelled;
                 }
 
                 minLength = textBoxForm.Value;
@@ -89,7 +89,7 @@ namespace SAM.Analytical.Revit.UI
             {
                 if (treeViewForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 {
-                    return;
+                    return Result.Cancelled;
                 }
 
                 templateNames = treeViewForm.SelectedItems?.ConvertAll(x => x.Name);
@@ -97,7 +97,7 @@ namespace SAM.Analytical.Revit.UI
 
             if (templateNames == null || templateNames.Count == 0)
             {
-                return;
+                return Result.Failed;
             }
 
 #if Revit2017 || Revit2018 || Revit2019 || Revit2020
@@ -157,6 +157,8 @@ namespace SAM.Analytical.Revit.UI
                     transaction.Commit();
                 }
             }
+
+            return Result.Succeeded;
         }
     }
 }

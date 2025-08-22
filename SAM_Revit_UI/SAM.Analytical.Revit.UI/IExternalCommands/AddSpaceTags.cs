@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
 using SAM.Core.Revit.UI;
 using System;
@@ -25,18 +26,18 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override void Execute()
+        public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elements)
         {
-            Document document = Document;
+            Document document = externalCommandData.Application.ActiveUIDocument.Document;
             if (document == null)
             {
-                return;
+                return Result.Failed;
             }
 
             List<Autodesk.Revit.DB.Mechanical.SpaceTagType> spaceTagTypes = new FilteredElementCollector(document).OfCategory(BuiltInCategory.OST_MEPSpaceTags).WhereElementIsElementType().Cast<Autodesk.Revit.DB.Mechanical.SpaceTagType>().ToList();
             if (spaceTagTypes == null || spaceTagTypes.Count == 0)
             {
-                return;
+                return Result.Failed;
             }
 
             List<Tuple<Autodesk.Revit.DB.Mechanical.SpaceTagType, List<string>>> tuples = new List<Tuple<Autodesk.Revit.DB.Mechanical.SpaceTagType, List<string>>>();
@@ -82,6 +83,8 @@ namespace SAM.Analytical.Revit.UI
 
                 transaction.Commit();
             }
+
+            return Result.Succeeded;
         }
     }
 }
